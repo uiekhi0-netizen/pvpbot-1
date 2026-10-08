@@ -9,11 +9,14 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - run: unzip -o *.zip
-      - run: mvn -B -f PvPBot/pom.xml clean package
-      - run: ls -la PvPBot/target
+      - run: unzip -o "*.zip" -d out || true
+      - run: |
+          POM=$(find . -name pom.xml -not -path "*/node_modules/*" | head -n 1)
+          echo "Using $POM"
+          mvn -B -f "$POM" clean package
+      - run: find . -name "*.jar" -path "*target*"
       - uses: actions/upload-artifact@v4
         with:
           name: pvpbot-jar
-          path: PvPBot/target/*.jar
+          path: "**/target/PvPBot-*.jar"
           if-no-files-found: error
